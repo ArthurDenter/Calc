@@ -7,13 +7,38 @@
     <title>Calculator</title>
 </head>
 <body>
-    <section class="result">
-        <div></div>
-    </section>
-    <section class="input">
-        <div class="input_numbers"></div>
-        <div class="input_operations"></div>
-    </section>
-    <script src="script.js"></script>
+    <main class="calc_app">
+        <section class="result">
+            <div class="result_display">
+                <p>0</p>
+            </div>
+        </section>
+        <section class="input">
+            <div class="input_numbers">
+                <button class="input_numbers_button" id="button_9">9</button>
+                <button class="input_numbers_button" id="button_8">8</button>
+                <button class="input_numbers_button" id="button_7">7</button>
+                <button class="input_numbers_button" id="button_6">6</button>
+                <button class="input_numbers_button" id="button_5">5</button>
+                <button class="input_numbers_button" id="button_4">4</button>
+                <button class="input_numbers_button" id="button_3">3</button>
+                <button class="input_numbers_button" id="button_2">2</button>
+                <button class="input_numbers_button" id="button_1">1</button>
+                <button class="input_numbers_button" id="button_0">0</button>
+                <button class="input_numbers_button" id="button_comma">,</button>
+            </div>
+            <div class="input_operations">
+                <button class="input_operations_button" id="button_free1"></button>
+                <button class="input_operations_button" id="button_free2"></button>
+                <button class="input_operations_button" id="button_free3"></button>
+                <button class="input_operations_button" id="button_plus">+</button>
+                <button class="input_operations_button" id="button_minus">-</button>
+                <button class="input_operations_button" id="button_div">/</button>
+                <button class="input_operations_button" id="button_mul">*</button>
+                <button class="input_operations_button" id="button_equ">=</button>
+            </div>
+        </section>
+        <script src="script.js"></script>
+    </main>
 </body>
 </html>
