@@ -18,107 +18,118 @@ body {
 }
 
 .result {
-    grid-row: 1/1;
+    grid-row: 1/2;
     background-color: ghostwhite;
 }
 
 .input {
-    grid-row: 2/3;
+    grid-row: 2/4;
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
+    justify-items: center;
+    align-items: center;
 }
-
+.input_operations,
 .input_numbers {
     grid-area: 1/1;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+    gap: 1%;
 }
 
-.input_numbers button{
-    
+.input_operations button,
+.input_numbers button {
+    background-color: #4CAF50;
+    /* Green */
+    border: 1px solid white;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 10%;
+    /* width: 66px;
+    height: 66px; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.input_operations {
-    grid-area: 1/1;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
-}
-
-#button_9{
+#button_9 {
     grid-area: 2/1/2/2;
 }
 
-#button_8{
+#button_8 {
     grid-area: 2/2/2/3;
 }
 
-#button_7{
+#button_7 {
     grid-area: 2/3/2/4;
 }
 
-#button_6{
+#button_6 {
     grid-area: 3/1/3/2;
 }
 
-#button_5{
+#button_5 {
     grid-area: 3/2/3/3;
 }
 
-#button_4{
+#button_4 {
     grid-area: 3/3/3/4;
 }
 
-#button_3{
+#button_3 {
     grid-area: 4/1/4/2;
 }
 
-#button_2{
+#button_2 {
     grid-area: 4/2/4/3;
 }
 
-#button_1{
+#button_1 {
     grid-area: 4/3/4/4;
 }
 
-#button_0{
+#button_0 {
     grid-area: 5/1/5/3;
 }
 
-#button_comma{
+#button_comma {
     grid-area: 5/3/5/4;
 }
 
-#button_plus{
+#button_plus {
     grid-area: 1/4/1/4;
 }
 
-#button_minus{
+#button_minus {
     grid-area: 2/4/2/4;
 }
 
-#button_mul{
+#button_mul {
     grid-area: 3/4/3/4;
 }
 
-#button_div{
+#button_div {
     grid-area: 4/4/4/4;
 }
 
-#button_equ{
+#button_equ {
     grid-area: 5/4/5/4;
 }
 
-#button_free1{
+#button_free1 {
     grid-area: 1/1/1/2;
 }
 
-#button_free2{
+#button_free2 {
     grid-area: 1/2/1/3;
 }
 
-#button_free3{
+#button_free3 {
     grid-area: 1/3/1/4;
 }
