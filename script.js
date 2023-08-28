@@ -1,8 +1,14 @@
-let arrOperations = [];
 
-function Input() {
-  this.operator = "";
-  this.trigger = "";
+
+function MathString(){
+  this.arrMathOperations = [];
+  this.mathStringForCalculation = "";
+  this.mathStringForOutput = ""; 
+}
+
+function Operator() {
+  this.mathOperator = "";
+  this.triggerObject = "";
 }
 
 let calculation = {
@@ -44,6 +50,10 @@ function expo(x, f) {
   return Number.parseFloat(x).toExponential(f);
 }
 
+function swapCommaPoint(str){
+  return str.replace(/\./i, ",");
+}
+
 function setButtonActive(id) {
   let button = document.getElementById(id);
   button.style.backgroundColor = "#D5573B";
@@ -59,10 +69,10 @@ function setButtonInactive(id) {
 function init() {
   let arrOfButtons = document.querySelectorAll("button");
   let resultDisplayString = document.querySelector(".result_display_string");
-  let strHasComma = false;
   let resetDisplayString = false;
   let arrOfGui = [];
-  let gui = new Input();
+  let gui = new Operator();
+  let mathStr = new MathString();
 
   resultDisplayString.innerHTML = "0";
   for (let button of arrOfButtons) {
@@ -80,27 +90,32 @@ function init() {
         case "9":
           if (resetDisplayString === true) {
             resultDisplayString.innerHTML = "";
-            calculationString = "";
+            mathStr.mathStringForCalculation = "";
             resetDisplayString = false;
-            setButtonInactive(arrOfGui[arrOfGui.length - 1].trigger);
+            setButtonInactive(arrOfGui[arrOfGui.length - 1].triggerObject);
           };
           if (resultDisplayString.innerHTML.length <= 12) {
-            arrOperations.push(e.target.innerText);
+            // mathStr.arrMathOperations.push(e.target.innerText);
             if (resultDisplayString.innerHTML !== "0") {
               if (resultDisplayString.innerHTML.length >= 9) resultDisplayString.style.fontSize = "4vmax";
+              mathStr.mathStringForCalculation += e.target.innerText;
               resultDisplayString.innerHTML += e.target.innerText;
+              mathStr.mathStringForOutput += e.target.innerText
               resultDisplayString.innerHTML = tSeparator(resultDisplayString.innerHTML);
+              mathStr.mathStringForOutput = tSeparator(resultDisplayString.innerHTML);
             } else {
               resultDisplayString.innerHTML = e.target.innerText;
+              mathStr.mathStringForOutput = e.target.innerText;
+              mathStr.mathStringForCalculation = e.target.innerText;
             };
           };
           break;
         case ",":
           if (resultDisplayString.innerHTML.length <= 12) {
-            if (strHasComma === false) {
-              arrOperations.push(".");
-              resultDisplayString.innerHTML += e.target.innerText;
-              strHasComma = true;
+            if (mathStr.mathStringForCalculation.includes(".") === false) {
+              mathStr.mathStringForCalculation += ".";
+              mathStr.mathStringForOutput += ",";
+              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
             };
           };
           break;
@@ -109,57 +124,68 @@ function init() {
         case "÷":
         case "×":
           //gui related
-          gui = new Input();
+          gui = new Operator();
           resetDisplayString = true;
-          gui.trigger = e.target.id;
-          gui.operator = e.target.innerText;
+          gui.triggerObject = e.target.id;
+          gui.mathOperator = e.target.innerText;
           arrOfGui.push(gui);
           setButtonActive(e.target.id);
-
+          //add operands to array
+          mathStr.arrMathOperations.push(mathStr.mathStringForCalculation);
           //add operation to array
-          arrOperations.push(`#${e.target.innerText}#`);
+          mathStr.arrMathOperations.push(`#${e.target.innerText}#`);
           //the first element in the array may only be a number
-          if (arrOperations[0].match(/\#[×\-+÷]\#/)) {
-            arrOperations.splice(0, 1);
+          if (mathStr.arrMathOperations[0].match(/\#[×\-+÷]\#/)) {
+            mathStr.arrMathOperations.splice(0, 1);
             setButtonInactive(e.target.id);
           };
           //just one operation at a time
-          if (arrOperations.length > 2) {
-            if (arrOperations[arrOperations.length - 2].match(/\#[×\-+÷]\#/)) {
-              arrOperations.splice((arrOperations.length - 2), 1);
-              setButtonInactive(arrOfGui[arrOfGui.length - 2].trigger);
+          if (mathStr.arrMathOperations.length > 2) {
+            if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 2].match(/\#[×\-+÷]\#/)) {
+              mathStr.arrMathOperations.splice((mathStr.arrMathOperations.length - 2), 1);
+              setButtonInactive(arrOfGui[arrOfGui.length - 2].triggerObject);
             }
           };
           //check whether there is a mathematical operation in the foreground. if so, calculate the last operation and output it.
-          if (arrOperations.length > 3) {
-            if (arrOperations[arrOperations.length - 3].match(/\#[×\-+÷]\#/)) {
+          if (mathStr.arrMathOperations.length > 3) {
+            if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 3].match(/\#[×\-+÷]\#/)) {
               const re = /#/;
-              let string = arrOperations.join("");
+              let string = mathStr.arrMathOperations.join("");
               let arr = string.split(re);
               if (arr[arr.length - 1] === "") arr.pop();
               let result = getResult(arr);
-              resultDisplayString.innerHTML = tSeparator(result);
+              mathStr.mathStringForCalculation = result;
+              mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
             };
           };
           break;
         case "=":
+          //add operands to array
+          mathStr.arrMathOperations.push(mathStr.mathStringForCalculation);
+          
           const re = /#/;
-          if (arrOperations[arrOperations.length - 1].match(/\#[×\-+÷]\#/)) arrOperations.splice((arrOperations.length - 1), 1);
-          let string = arrOperations.join("");
+          if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 1].match(/\#[×\-+÷]\#/)) mathStr.arrMathOperations.splice((mathStr.arrMathOperations.length - 1), 1);
+          let string = mathStr.arrMathOperations.join("");
           let arr = string.split(re);
           let result = getResult(arr);
-          resultDisplayString.innerHTML = tSeparator(result);
+          mathStr.mathStringForCalculation = result;
+          mathStr.arrMathOperations.length = 0;
+          mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+          resultDisplayString.innerHTML = mathStr.mathStringForOutput;
           console.log(result);
           break;
         case "AC":
           break;
         case "±":
-          let arrTemp = [];
-          if (arrOperations.join("").search(/\#[×\-+÷]\#/) >= 0) {
-            
-          }
+          let tempStr = "";
+          mathStr.mathStringForCalculation = tempStr.concat("-", mathStr.mathStringForCalculation);
+          mathStr.mathStringForOutput = tempStr.concat("-", mathStr.mathStringForOutput);
+          resultDisplayString.innerHTML = mathStr.mathStringForOutput;
       };
-      console.log(arrOperations);
+      console.log(`arrMathOperations: ${mathStr.arrMathOperations}`);
+      console.log(`mathStringForCalculation: ${mathStr.mathStringForCalculation}`);
+      console.log(`mathStr.mathStringForOutput: ${mathStr.mathStringForOutput}`);
     });
   };
 };
