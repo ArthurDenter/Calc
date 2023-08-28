@@ -136,6 +136,7 @@ function init() {
               const re = /#/;
               let string = arrOperations.join("");
               let arr = string.split(re);
+              if (arr[arr.length - 1] === "") arr.pop();
               let result = getResult(arr);
               resultDisplayString.innerHTML = tSeparator(result);
             };
@@ -151,6 +152,12 @@ function init() {
           console.log(result);
           break;
         case "AC":
+          break;
+        case "±":
+          let arrTemp = [];
+          if (arrOperations.join("").search(/\#[×\-+÷]\#/) >= 0) {
+            
+          }
       };
       console.log(arrOperations);
     });
