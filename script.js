@@ -1,9 +1,9 @@
 
 
-function MathString(){
+function MathString() {
   this.arrMathOperations = [];
   this.mathStringForCalculation = "";
-  this.mathStringForOutput = ""; 
+  this.mathStringForOutput = "";
 }
 
 function Operator() {
@@ -17,7 +17,8 @@ let calculation = {
   ["+"]: function () { return this.a + this.b },
   ["-"]: function () { return this.a - this.b },
   ["÷"]: function () { return this.a / this.b },
-  ["×"]: function () { return this.a * this.b }
+  ["×"]: function () { return this.a * this.b },
+  ["%"]: function () { return this.a / this.b }
 };
 
 function getResult(arr) {
@@ -28,7 +29,6 @@ function getResult(arr) {
         calculation.b = Number(arr[i + 1]);
         let interimResult = calculation[arr[i]]();
         arr.splice(0, 3, interimResult.toString());
-        console.log(interimResult);
         getResult(arr);
       };
     };
@@ -50,7 +50,7 @@ function expo(x, f) {
   return Number.parseFloat(x).toExponential(f);
 }
 
-function swapCommaPoint(str){
+function swapCommaPoint(str) {
   return str.replace(/\./i, ",");
 }
 
@@ -92,7 +92,11 @@ function init() {
             resultDisplayString.innerHTML = "";
             mathStr.mathStringForCalculation = "";
             resetDisplayString = false;
-            setButtonInactive(arrOfGui[arrOfGui.length - 1].triggerObject);
+            if (arrOfGui.length > 0) {
+              setButtonInactive(arrOfGui[arrOfGui.length - 1].triggerObject);
+              arrOfGui[arrOfGui.length - 1].triggerObject = "";
+              arrOfGui[arrOfGui.length - 1].mathOperator = "";
+            };
           };
           if (resultDisplayString.innerHTML.length <= 12) {
             // mathStr.arrMathOperations.push(e.target.innerText);
@@ -140,11 +144,11 @@ function init() {
             setButtonInactive(e.target.id);
           };
           //just one operation at a time
-          if (mathStr.arrMathOperations.length > 2) {
-            if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 2].match(/\#[×\-+÷]\#/)) {
-              mathStr.arrMathOperations.splice((mathStr.arrMathOperations.length - 2), 1);
+          if (arrOfGui.length > 1) {
+            if (arrOfGui[arrOfGui.length - 2].mathOperator.match(/[×\-+÷]/)) {
+              mathStr.arrMathOperations.splice((mathStr.arrMathOperations.length - 3), 3, "#" + arrOfGui[arrOfGui.length - 1].mathOperator + "#");
               setButtonInactive(arrOfGui[arrOfGui.length - 2].triggerObject);
-            }
+            };
           };
           //check whether there is a mathematical operation in the foreground. if so, calculate the last operation and output it.
           if (mathStr.arrMathOperations.length > 3) {
@@ -163,19 +167,39 @@ function init() {
         case "=":
           //add operands to array
           mathStr.arrMathOperations.push(mathStr.mathStringForCalculation);
-          
+
           const re = /#/;
           if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 1].match(/\#[×\-+÷]\#/)) mathStr.arrMathOperations.splice((mathStr.arrMathOperations.length - 1), 1);
           let string = mathStr.arrMathOperations.join("");
           let arr = string.split(re);
           let result = getResult(arr);
           mathStr.mathStringForCalculation = result;
+          //clear array
           mathStr.arrMathOperations.length = 0;
           mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
           resultDisplayString.innerHTML = mathStr.mathStringForOutput;
-          console.log(result);
+          resetDisplayString = true;
+          break;
+        case "%":
+          if (mathStr.arrMathOperations.length < 2) {
+            calculation.a = mathStr.mathStringForCalculation;
+            calculation.b = 100;
+            mathStr.mathStringForOutput = calculation["÷"]();
+            resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+          } else {
+            if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 1].match(/\#[\-+]\#/)) {
+              mathStr.mathStringForOutput += e.target.innerText;
+              mathStr.mathStringForCalculation = ((mathStr.mathStringForCalculation * mathStr.arrMathOperations[mathStr.arrMathOperations.length - 2]) / 100).toString();
+              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+            } else if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 1].match(/\#[×÷]\#/)) {
+              mathStr.mathStringForOutput += e.target.innerText;
+              mathStr.mathStringForCalculation = (mathStr.mathStringForCalculation / 100).toString();
+              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+            };
+          };
           break;
         case "AC":
+          location.reload();
           break;
         case "±":
           let tempStr = "";
