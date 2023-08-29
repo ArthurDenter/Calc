@@ -22,16 +22,21 @@ let calculation = {
 };
 
 function getResult(arr) {
-  for (let i = 0; i <= arr.length - 2; i++) {
-    if (arr.length >= 3) {
-      if (arr[i].match(/[×\-+÷](?!\d)/)) {
-        calculation.a = Number(arr[i - 1]);
-        calculation.b = Number(arr[i + 1]);
-        let interimResult = calculation[arr[i]]();
-        arr.splice(0, 3, interimResult.toString());
-        getResult(arr);
+  try {
+    for (let i = 0; i <= arr.length - 2; i++) {
+      if (arr.length >= 3) {
+        if (arr[i].match(/[×\-+÷](?!\d)/)) {
+          calculation.a = Number(arr[i - 1]);
+          calculation.b = Number(arr[i + 1]);
+          let interimResult = calculation[arr[i]]();
+          arr.splice(0, 3, interimResult.toString());
+          getResult(arr);
+        };
       };
     };
+  }
+  catch (error) {
+    alert(error);
   };
   //Check whether the number of decimal places is greater than 12, then display as an e function.
   if (!Number.isInteger(Number(arr))) {
@@ -158,25 +163,42 @@ function init() {
               let arr = string.split(re);
               if (arr[arr.length - 1] === "") arr.pop();
               let result = getResult(arr);
-              mathStr.mathStringForCalculation = result;
-              mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+              if (result !== "Infinity") {
+                mathStr.mathStringForCalculation = result;
+                mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+              } else {
+                mathStr.mathStringForOutput = "Error: Div/0";
+                //clear array
+                mathStr.arrMathOperations.length = 0;
+                resetDisplayString = true;
+              };
               resultDisplayString.innerHTML = mathStr.mathStringForOutput;
             };
           };
           break;
         case "=":
+          gui = new Operator();
+          resetDisplayString = true;
+          gui.triggerObject = e.target.id;
+          gui.mathOperator = e.target.innerText;
+          arrOfGui.push(gui);
           //add operands to array
           mathStr.arrMathOperations.push(mathStr.mathStringForCalculation);
-
           const re = /#/;
           if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 1].match(/\#[×\-+÷]\#/)) mathStr.arrMathOperations.splice((mathStr.arrMathOperations.length - 1), 1);
           let string = mathStr.arrMathOperations.join("");
           let arr = string.split(re);
           let result = getResult(arr);
-          mathStr.mathStringForCalculation = result;
-          //clear array
-          mathStr.arrMathOperations.length = 0;
-          mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+          if (result !== "Infinity") {
+            mathStr.mathStringForCalculation = result;
+            //clear array
+            mathStr.arrMathOperations.length = 0;
+            mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+          } else {
+            mathStr.mathStringForOutput = "Error: Div/0";
+            //clear array
+            mathStr.arrMathOperations.length = 0;
+          };
           resultDisplayString.innerHTML = mathStr.mathStringForOutput;
           resetDisplayString = true;
           break;
@@ -210,6 +232,7 @@ function init() {
       console.log(`arrMathOperations: ${mathStr.arrMathOperations}`);
       console.log(`mathStringForCalculation: ${mathStr.mathStringForCalculation}`);
       console.log(`mathStr.mathStringForOutput: ${mathStr.mathStringForOutput}`);
+      console.log(`arrOfGui: ${Object.values(arrOfGui[arrOfGui.length-1])}`);
     });
   };
 };
