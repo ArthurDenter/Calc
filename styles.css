@@ -81,6 +81,12 @@ body {
     justify-content: center;
     align-items: center;
 }
+.input_operations_button:focus,
+.input_numbers_button:focus {
+    color:#D5573B;
+    outline: none;
+    border: 2px solid #D5573B;;
+}
 
 .input_operations_button{
     background-color: #94C9A9;
