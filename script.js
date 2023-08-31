@@ -24,7 +24,9 @@ let interface = {
   ["+"]: "button_plus",
   ["-"]: "button_minus",
   ["/"]: "button_div",
+  ["÷"]: "button_div",
   ["*"]: "button_mul",
+  ["×"]: "button_mul",
   ["±"]: "button_free2",
   ["%"]: "button_free3",
   ["="]: "button_equ",
@@ -71,6 +73,10 @@ function getResult(arr) {
   return arr[0];
 };
 
+function backspaceStr(str) {
+  return str.slice(0, str.length - 1);
+}
+
 function expo(x, f) {
   return Number.parseFloat(x).toExponential(f);
 }
@@ -90,6 +96,46 @@ function setButtonInactive(id) {
   button.style.backgroundColor = "#94C9A9";
   button.style.color = "#777DA7";
 }
+
+function tSeparator(str) {
+  //add thousands separator
+  let separatorCount = 0;
+  let arrBeforeComma, arrayAfterComma = [];
+  let arrWithoutMinus = [];
+  let strHasComma = false;
+  let strHasMinus = false;
+
+  //check if a comma is within string
+  strHasComma = str.includes(",");
+  if (strHasComma) {
+    arrBeforeComma = str.match(/\d+(?=[\-\.,])/g).join("").split("");
+    arrayAfterComma = str.match(/,\s*([0-9]+)/g);
+  } else {
+    arrBeforeComma = str.match(/([\-0-9])/g);
+  };
+  strHasMinus = arrBeforeComma.includes("-");
+  if (strHasMinus) {
+    arrWithoutMinus = arrBeforeComma.join("").match(/([0-9])/g);
+  } else {
+    arrWithoutMinus = [...arrBeforeComma];
+  }
+
+  let lenOfArrWithoutMinus = arrWithoutMinus.length;
+  arrWithoutMinus.reverse();
+  for (let i = 0; i <= (lenOfArrWithoutMinus - 1); i++) {
+    if ((i > 0) && (i % 3 === 0)) {
+      arrWithoutMinus.splice(i + separatorCount, 0, ".");
+      separatorCount++;
+    };
+  };
+  arrWithoutMinus.reverse();
+  if (strHasMinus) {
+    return "-" + arrWithoutMinus.join("") + arrayAfterComma.join("");
+  }
+  else {
+    return arrWithoutMinus.join("") + arrayAfterComma.join("");
+  };
+};
 
 function init() {
   let arrOfButtons = document.querySelectorAll("button");
@@ -160,6 +206,39 @@ function init() {
             };
           };
           break;
+        case "NumpadEnter":
+          gui = new Operator();
+          resetDisplayString = true;
+          gui.triggerObject = interface[e.key];
+          gui.mathOperator = e.key;
+          arrOfGui.push(gui);
+          //add operands to array
+          mathStr.arrMathOperations.push(mathStr.mathStringForCalculation);
+          const re = /#/;
+          if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 1].match(/\#[×\-+÷]\#/)) mathStr.arrMathOperations.splice((mathStr.arrMathOperations.length - 1), 1);
+          let string = mathStr.arrMathOperations.join("");
+          let arr = string.split(re);
+          let result = getResult(arr);
+          if (result !== "Infinity") {
+            mathStr.mathStringForCalculation = result;
+            //clear array
+            mathStr.arrMathOperations.length = 0;
+            mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+          } else {
+            mathStr.mathStringForOutput = "Error: Div/0";
+            //clear array
+            mathStr.arrMathOperations.length = 0;
+          };
+          resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+          resetDisplayString = true;
+          break;
+        case "Backspace":
+          if (resetDisplayString === false) {
+            mathStr.mathStringForCalculation = backspaceStr(mathStr.mathStringForCalculation);
+            mathStr.mathStringForOutput = backspaceStr(mathStr.mathStringForOutput);
+            resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+          };
+          break;
         case "NumpadAdd":
         case "NumpadSubtract":
         case "NumpadMultiply":
@@ -213,6 +292,7 @@ function init() {
               resultDisplayString.innerHTML = mathStr.mathStringForOutput;
             };
           };
+          break;
       };
       console.log(`arrMathOperations: ${mathStr.arrMathOperations}`);
       console.log(`mathStringForCalculation: ${mathStr.mathStringForCalculation}`);
@@ -360,7 +440,7 @@ function init() {
             };
           };
           break;
-        case "AC":
+        case "C":
           location.reload();
           break;
         case "±":
@@ -375,33 +455,6 @@ function init() {
       console.log(`gui.mathOperator: ${gui.mathOperator}`);
     });
   };
-};
-
-function tSeparator(str) {
-  //add thousands separator
-  let separatorCount = 0;
-  let arrBeforeComma, arrayAfterComma = [];
-  let strHasComma = false;
-
-  //check if a comma is within string
-  strHasComma = str.includes(",");
-  if (strHasComma) {
-    arrBeforeComma = str.match(/\d+(?=[\-\.,])/g).join("").split("");
-    arrayAfterComma = str.match(/,\s*([0-9]+)/g);
-  } else {
-    arrBeforeComma = str.match(/([\-0-9])/g);
-  };
-  let lenOfArrBeforeComma = arrBeforeComma.length;
-  arrBeforeComma.reverse();
-  for (let i = 0; i <= (lenOfArrBeforeComma - 1); i++) {
-    if ((i > 0) && (i % 3 === 0)) {
-      arrBeforeComma.splice(i + separatorCount, 0, ".");
-      separatorCount++;
-    };
-  };
-  arrBeforeComma.reverse();
-  str = arrBeforeComma.join("") + arrayAfterComma.join("");
-  return str;
 };
 
 init();
