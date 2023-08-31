@@ -4,12 +4,24 @@ function MathString() {
   this.arrMathOperations = [];
   this.mathStringForCalculation = "";
   this.mathStringForOutput = "";
-}
+  this.maxNumberOfDigits = 12;
+
+  this.updateMathStrings = function (digit) {
+    let tempDisplayStr = "";
+    if (digit === ",") {
+      this.mathStringForCalculation += ".";
+    } else {
+      this.mathStringForCalculation += digit;
+    };
+    tempDisplayStr = this.mathStringForOutput + digit;
+    this.mathStringForOutput = tSeparator(tempDisplayStr);
+  };
+};
 
 function Operator() {
   this.mathOperator = "";
   this.triggerObject = "";
-}
+};
 
 let calculation = {
   a: null,
@@ -60,17 +72,20 @@ function getResult(arr) {
   catch (error) {
     alert(error);
   };
-  //Check whether the number of decimal places is greater than 12, then display as an e function.
-  if (!Number.isInteger(Number(arr))) {
-    if (arr[0].length >= 12) {
-      // let arrSplit = arr[0].split(".");
-      // if (arrSplit[1].length >= 10) {
-      //   arr = expo(arrSplit[1], 4).toString();
-      // };
-      arr = expo(arr[0], 4).toString();
+  if (arr[0] < Number.MAX_VALUE){
+    return arr[0];
+  } else {
+    return Infinity;
+  }
+};
+
+function maxNumberOfDigits(str, maxNumberOfDigits){
+  //Check whether the number of decimal places is greater than mathStr.maxNumberOfDigits, then display as an e function.
+    if (str.length >= maxNumberOfDigits) {
+      return expo(str, 4).toString();
+    }else{
+      return str;
     };
-  };
-  return arr[0];
 };
 
 function backspaceStr(str) {
@@ -100,7 +115,7 @@ function setButtonInactive(id) {
 function tSeparator(str) {
   //add thousands separator
   let separatorCount = 0;
-  let arrBeforeComma, arrayAfterComma = [];
+  let arrBeforeComma, arrAfterComma = [];
   let arrWithoutMinus = [];
   let strHasComma = false;
   let strHasMinus = false;
@@ -109,7 +124,8 @@ function tSeparator(str) {
   strHasComma = str.includes(",");
   if (strHasComma) {
     arrBeforeComma = str.match(/\d+(?=[\-\.,])/g).join("").split("");
-    arrayAfterComma = str.match(/,\s*([0-9]+)/g);
+    arrAfterComma = str.match(/,\s*([0-9]+)/g);
+    if (arrAfterComma === null) arrAfterComma = [""];
   } else {
     arrBeforeComma = str.match(/([\-0-9])/g);
   };
@@ -130,11 +146,15 @@ function tSeparator(str) {
   };
   arrWithoutMinus.reverse();
   if (strHasMinus) {
-    return "-" + arrWithoutMinus.join("") + arrayAfterComma.join("");
+    return "-" + arrWithoutMinus.join("") + arrAfterComma.join("");
   }
   else {
-    return arrWithoutMinus.join("") + arrayAfterComma.join("");
+    return arrWithoutMinus.join("") + arrAfterComma.join("");
   };
+};
+
+function updateDisplay(str) {
+
 };
 
 function init() {
@@ -172,6 +192,7 @@ function init() {
         case "Numpad9":
           if (resetDisplayString === true) {
             resultDisplayString.innerHTML = "";
+            mathStr.mathStringForOutput = "";
             mathStr.mathStringForCalculation = "";
             resetDisplayString = false;
             if (arrOfGui.length > 0) {
@@ -180,28 +201,23 @@ function init() {
               arrOfGui[arrOfGui.length - 1].mathOperator = "";
             };
           };
-          if (resultDisplayString.innerHTML.length <= 12) {
-            // mathStr.arrMathOperations.push(e.target.innerText);
+          if (resultDisplayString.innerHTML.length <= mathStr.maxNumberOfDigits) {
             if (resultDisplayString.innerHTML !== "0") {
               if (resultDisplayString.innerHTML.length >= 9) resultDisplayString.style.fontSize = "4vmax";
-              mathStr.mathStringForCalculation += e.key;
-              resultDisplayString.innerHTML += e.key;
-              mathStr.mathStringForOutput += e.key
-              resultDisplayString.innerHTML = tSeparator(resultDisplayString.innerHTML);
-              mathStr.mathStringForOutput = tSeparator(resultDisplayString.innerHTML);
+              mathStr.updateMathStrings(e.key);
+              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
             } else {
-              resultDisplayString.innerHTML = e.key;
               mathStr.mathStringForOutput = e.key;
               mathStr.mathStringForCalculation = e.key;
+              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
             };
           };
           break;
         case "NumpadDecimal":
         case "Comma":
-          if (resultDisplayString.innerHTML.length <= 12) {
+          if (resultDisplayString.innerHTML.length <= mathStr.maxNumberOfDigits) {
             if (mathStr.mathStringForCalculation.includes(".") === false) {
-              mathStr.mathStringForCalculation += ".";
-              mathStr.mathStringForOutput += ",";
+              mathStr.updateMathStrings(e.key);
               resultDisplayString.innerHTML = mathStr.mathStringForOutput;
             };
           };
@@ -220,10 +236,15 @@ function init() {
           let arr = string.split(re);
           let result = getResult(arr);
           if (result !== "Infinity") {
+            result = maxNumberOfDigits(result, mathStr.maxNumberOfDigits);
             mathStr.mathStringForCalculation = result;
             //clear array
             mathStr.arrMathOperations.length = 0;
-            mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+            if (result.match(/\d+[,\.]\d+e[-+]\d+/g)){
+              mathStr.mathStringForOutput = swapCommaPoint(result);
+            }else{
+              mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+            };
           } else {
             mathStr.mathStringForOutput = "Error: Div/0";
             //clear array
@@ -299,7 +320,7 @@ function init() {
       console.log(`mathStr.mathStringForOutput: ${mathStr.mathStringForOutput}`);
       console.log(`gui.mathOperator: ${gui.mathOperator}`);
     });
-  }
+  };
   for (let button of arrOfButtons) {
     button.addEventListener("click", (e) => {
       switch (e.target.innerText) {
@@ -316,6 +337,7 @@ function init() {
           if (resetDisplayString === true) {
             resultDisplayString.innerHTML = "";
             mathStr.mathStringForCalculation = "";
+            mathStr.mathStringForOutput = "";
             resetDisplayString = false;
             if (arrOfGui.length > 0) {
               setButtonInactive(arrOfGui[arrOfGui.length - 1].triggerObject);
@@ -323,15 +345,11 @@ function init() {
               arrOfGui[arrOfGui.length - 1].mathOperator = "";
             };
           };
-          if (resultDisplayString.innerHTML.length <= 12) {
-            // mathStr.arrMathOperations.push(e.target.innerText);
+          if (resultDisplayString.innerHTML.length <= mathStr.maxNumberOfDigits) {
             if (resultDisplayString.innerHTML !== "0") {
               if (resultDisplayString.innerHTML.length >= 9) resultDisplayString.style.fontSize = "4vmax";
-              mathStr.mathStringForCalculation += e.target.innerText;
-              resultDisplayString.innerHTML += e.target.innerText;
-              mathStr.mathStringForOutput += e.target.innerText
-              resultDisplayString.innerHTML = tSeparator(resultDisplayString.innerHTML);
-              mathStr.mathStringForOutput = tSeparator(resultDisplayString.innerHTML);
+              mathStr.updateMathStrings(e.target.innerText);
+              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
             } else {
               resultDisplayString.innerHTML = e.target.innerText;
               mathStr.mathStringForOutput = e.target.innerText;
@@ -340,7 +358,7 @@ function init() {
           };
           break;
         case ",":
-          if (resultDisplayString.innerHTML.length <= 12) {
+          if (resultDisplayString.innerHTML.length <= mathStr.maxNumberOfDigits) {
             if (mathStr.mathStringForCalculation.includes(".") === false) {
               mathStr.mathStringForCalculation += ".";
               mathStr.mathStringForOutput += ",";
@@ -410,10 +428,15 @@ function init() {
           let arr = string.split(re);
           let result = getResult(arr);
           if (result !== "Infinity") {
+            result = maxNumberOfDigits(result, mathStr.maxNumberOfDigits);
             mathStr.mathStringForCalculation = result;
             //clear array
             mathStr.arrMathOperations.length = 0;
-            mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+            if (result.match(/\d+[,\.]\d+e[-+]\d+/g)){
+              mathStr.mathStringForOutput = swapCommaPoint(result);
+            }else{
+              mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+            };
           } else {
             mathStr.mathStringForOutput = "Error: Div/0";
             //clear array
