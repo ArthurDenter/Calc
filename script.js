@@ -1,5 +1,3 @@
-
-
 function MathString() {
   this.arrMathOperations = [];
   this.mathStringForCalculation = "";
@@ -18,7 +16,7 @@ function MathString() {
   };
 };
 
-function Operator() {
+function CalculatorHelper() {
   this.mathOperator = "";
   this.triggerObject = "";
 };
@@ -58,6 +56,19 @@ let interface = {
 function getResult(arr) {
   try {
     for (let i = 0; i <= arr.length - 2; i++) {
+      if (arr.length >= (i + 3)) {
+        //multiplication, division first!
+        if (arr[i].match(/[\-+](?!\d)/) && arr[i + 2].match(/[×÷](?!\d)/)) {
+          calculation.a = Number(arr[i + 1]);
+          calculation.b = Number(arr[i + 3]);
+          let interimResult = calculation[arr[i + 2]]();
+          calculation.a = Number(arr[i - 1]);
+          calculation.b = interimResult;
+          interimResult = calculation[arr[i]]();
+          arr.splice(0, 5, interimResult.toString());
+          getResult(arr);
+        };
+      };
       if (arr.length >= 3) {
         if (arr[i].match(/[×\-+÷](?!\d)/)) {
           calculation.a = Number(arr[i - 1]);
@@ -72,20 +83,20 @@ function getResult(arr) {
   catch (error) {
     alert(error);
   };
-  if (arr[0] < Number.MAX_VALUE){
+  if (arr[0] < Number.MAX_VALUE) {
     return arr[0];
   } else {
     return Infinity;
   }
 };
 
-function maxNumberOfDigits(str, maxNumberOfDigits){
+function maxNumberOfDigits(str, maxNumberOfDigits) {
   //Check whether the number of decimal places is greater than mathStr.maxNumberOfDigits, then display as an e function.
-    if (str.length >= maxNumberOfDigits) {
-      return expo(str, 4).toString();
-    }else{
-      return str;
-    };
+  if (str.length >= maxNumberOfDigits) {
+    return expo(str, 4).toString();
+  } else {
+    return str;
+  };
 };
 
 function backspaceStr(str) {
@@ -122,14 +133,14 @@ function tSeparator(str) {
 
   //check if a comma is within string
   strHasComma = str.includes(",");
+  strHasMinus = str.includes("-");
   if (strHasComma) {
     arrBeforeComma = str.match(/\d+(?=[\-\.,])/g).join("").split("");
-    arrAfterComma = str.match(/,\s*([0-9]+)/g);
+    arrAfterComma = str.match(/,\s*([0-9]*)/g);
     if (arrAfterComma === null) arrAfterComma = [""];
   } else {
     arrBeforeComma = str.match(/([\-0-9])/g);
   };
-  strHasMinus = arrBeforeComma.includes("-");
   if (strHasMinus) {
     arrWithoutMinus = arrBeforeComma.join("").match(/([0-9])/g);
   } else {
@@ -161,9 +172,10 @@ function init() {
   let arrOfButtons = document.querySelectorAll("button");
   let resultDisplayString = document.querySelector(".result_display_string");
   let resetDisplayString = false;
-  let arrOfGui = [];
-  let gui = new Operator();
+  let arrOfHelper = [];
+  let helper = new CalculatorHelper();
   let mathStr = new MathString();
+  let result = null;
 
   resultDisplayString.innerHTML = "0";
   for (let button of arrOfButtons) {
@@ -195,10 +207,10 @@ function init() {
             mathStr.mathStringForOutput = "";
             mathStr.mathStringForCalculation = "";
             resetDisplayString = false;
-            if (arrOfGui.length > 0) {
-              setButtonInactive(arrOfGui[arrOfGui.length - 1].triggerObject);
-              arrOfGui[arrOfGui.length - 1].triggerObject = "";
-              arrOfGui[arrOfGui.length - 1].mathOperator = "";
+            if (arrOfHelper.length > 0) {
+              setButtonInactive(arrOfHelper[arrOfHelper.length - 1].triggerObject);
+              arrOfHelper[arrOfHelper.length - 1].triggerObject = "";
+              arrOfHelper[arrOfHelper.length - 1].mathOperator = "";
             };
           };
           if (resultDisplayString.innerHTML.length <= mathStr.maxNumberOfDigits) {
@@ -223,26 +235,26 @@ function init() {
           };
           break;
         case "NumpadEnter":
-          gui = new Operator();
+          helper = new CalculatorHelper();
           resetDisplayString = true;
-          gui.triggerObject = interface[e.key];
-          gui.mathOperator = e.key;
-          arrOfGui.push(gui);
+          helper.triggerObject = interface[e.key];
+          helper.mathOperator = e.key;
+          arrOfHelper.push(helper);
           //add operands to array
           mathStr.arrMathOperations.push(mathStr.mathStringForCalculation);
           const re = /#/;
           if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 1].match(/\#[×\-+÷]\#/)) mathStr.arrMathOperations.splice((mathStr.arrMathOperations.length - 1), 1);
           let string = mathStr.arrMathOperations.join("");
           let arr = string.split(re);
-          let result = getResult(arr);
+          result = getResult(arr);
           if (result !== "Infinity") {
             result = maxNumberOfDigits(result, mathStr.maxNumberOfDigits);
             mathStr.mathStringForCalculation = result;
             //clear array
             mathStr.arrMathOperations.length = 0;
-            if (result.match(/\d+[,\.]\d+e[-+]\d+/g)){
+            if (result.match(/\d+[,\.]\d+e[-+]\d+/g)) {
               mathStr.mathStringForOutput = swapCommaPoint(result);
-            }else{
+            } else {
               mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
             };
           } else {
@@ -266,14 +278,14 @@ function init() {
         case "NumpadDivide":
         case "Slash":
         case "BracketRight":
-          //gui related
-          gui = new Operator();
+          //helper related
+          helper = new CalculatorHelper();
           resetDisplayString = true;
-          gui.triggerObject = interface[e.key];
-          if (e.code === "NumpadDivide") gui.mathOperator = "÷"
-          else if (e.code === "NumpadMultiply") gui.mathOperator = "×"
-          else gui.mathOperator = e.key;
-          arrOfGui.push(gui);
+          helper.triggerObject = interface[e.key];
+          if (e.code === "NumpadDivide") helper.mathOperator = "÷"
+          else if (e.code === "NumpadMultiply") helper.mathOperator = "×"
+          else helper.mathOperator = e.key;
+          arrOfHelper.push(helper);
           setButtonActive(interface[e.key]);
           //add operands to array
           mathStr.arrMathOperations.push(mathStr.mathStringForCalculation);
@@ -287,28 +299,35 @@ function init() {
             setButtonInactive(interface[e.key]);
           };
           //just one operation at a time
-          if (arrOfGui.length > 1) {
-            if (arrOfGui[arrOfGui.length - 2].mathOperator.match(/[×\-+÷]/)) {
-              mathStr.arrMathOperations.splice((mathStr.arrMathOperations.length - 3), 3, "#" + arrOfGui[arrOfGui.length - 1].mathOperator + "#");
-              setButtonInactive(arrOfGui[arrOfGui.length - 2].triggerObject);
+          if (arrOfHelper.length > 1) {
+            if (arrOfHelper[arrOfHelper.length - 2].mathOperator.match(/[×\-+÷]/)) {
+              mathStr.arrMathOperations.splice((mathStr.arrMathOperations.length - 3), 3, "#" + arrOfHelper[arrOfHelper.length - 1].mathOperator + "#");
+              setButtonInactive(arrOfHelper[arrOfHelper.length - 2].triggerObject);
             };
           };
           //check whether there is a mathematical operation in the foreground. if so, calculate the last operation and output it.
           if (mathStr.arrMathOperations.length > 3) {
             if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 3].match(/\#[×\-+÷]\#/)) {
-              const re = /#/;
-              let string = mathStr.arrMathOperations.join("");
-              let arr = string.split(re);
-              if (arr[arr.length - 1] === "") arr.pop();
-              let result = getResult(arr);
-              if (result !== "Infinity") {
-                mathStr.mathStringForCalculation = result;
-                mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+              // "Remember the order of operations!"
+              // PEMDAS: Parentheses (Klammern), Exponents (Potenzen), Multiplication (Multiplikation), Division (Division), Addition (Addition), Subtraction (Subtraktion)
+              if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 1].match(/\#[×÷]\#/) && mathStr.arrMathOperations[mathStr.arrMathOperations.length - 3].match(/\#[\-+]\#/)) {
+                //multiplication, division first!
+                //no interim result
               } else {
-                mathStr.mathStringForOutput = "Error: Div/0";
-                //clear array
-                mathStr.arrMathOperations.length = 0;
-                resetDisplayString = true;
+                const regEx = /#/;
+                let string = mathStr.arrMathOperations.join("");
+                let arr = string.split(regEx);
+                if (arr[arr.length - 1] === "") arr.pop();
+                result = getResult(arr);
+                if (result !== "Infinity") {
+                  mathStr.mathStringForCalculation = result;
+                  mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+                } else {
+                  mathStr.mathStringForOutput = "Error: Div/0";
+                  //clear array
+                  mathStr.arrMathOperations.length = 0;
+                  resetDisplayString = true;
+                };
               };
               resultDisplayString.innerHTML = mathStr.mathStringForOutput;
             };
@@ -318,7 +337,7 @@ function init() {
       console.log(`arrMathOperations: ${mathStr.arrMathOperations}`);
       console.log(`mathStringForCalculation: ${mathStr.mathStringForCalculation}`);
       console.log(`mathStr.mathStringForOutput: ${mathStr.mathStringForOutput}`);
-      console.log(`gui.mathOperator: ${gui.mathOperator}`);
+      console.log(`helper.mathOperator: ${helper.mathOperator}`);
     });
   };
   for (let button of arrOfButtons) {
@@ -339,10 +358,10 @@ function init() {
             mathStr.mathStringForCalculation = "";
             mathStr.mathStringForOutput = "";
             resetDisplayString = false;
-            if (arrOfGui.length > 0) {
-              setButtonInactive(arrOfGui[arrOfGui.length - 1].triggerObject);
-              arrOfGui[arrOfGui.length - 1].triggerObject = "";
-              arrOfGui[arrOfGui.length - 1].mathOperator = "";
+            if (arrOfHelper.length > 0) {
+              setButtonInactive(arrOfHelper[arrOfHelper.length - 1].triggerObject);
+              arrOfHelper[arrOfHelper.length - 1].triggerObject = "";
+              arrOfHelper[arrOfHelper.length - 1].mathOperator = "";
             };
           };
           if (resultDisplayString.innerHTML.length <= mathStr.maxNumberOfDigits) {
@@ -370,12 +389,12 @@ function init() {
         case "+":
         case "÷":
         case "×":
-          //gui related
-          gui = new Operator();
+          //helper related
+          helper = new CalculatorHelper();
           resetDisplayString = true;
-          gui.triggerObject = e.target.id;
-          gui.mathOperator = e.target.innerText;
-          arrOfGui.push(gui);
+          helper.triggerObject = e.target.id;
+          helper.mathOperator = e.target.innerText;
+          arrOfHelper.push(helper);
           setButtonActive(e.target.id);
           //add operands to array
           mathStr.arrMathOperations.push(mathStr.mathStringForCalculation);
@@ -387,54 +406,61 @@ function init() {
             setButtonInactive(e.target.id);
           };
           //just one operation at a time
-          if (arrOfGui.length > 1) {
-            if (arrOfGui[arrOfGui.length - 2].mathOperator.match(/[×\-+÷]/)) {
-              mathStr.arrMathOperations.splice((mathStr.arrMathOperations.length - 3), 3, "#" + arrOfGui[arrOfGui.length - 1].mathOperator + "#");
-              setButtonInactive(arrOfGui[arrOfGui.length - 2].triggerObject);
+          if (arrOfHelper.length > 1) {
+            if (arrOfHelper[arrOfHelper.length - 2].mathOperator.match(/[×\-+÷]/)) {
+              mathStr.arrMathOperations.splice((mathStr.arrMathOperations.length - 3), 3, "#" + arrOfHelper[arrOfHelper.length - 1].mathOperator + "#");
+              setButtonInactive(arrOfHelper[arrOfHelper.length - 2].triggerObject);
             };
           };
           //check whether there is a mathematical operation in the foreground. if so, calculate the last operation and output it.
           if (mathStr.arrMathOperations.length > 3) {
             if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 3].match(/\#[×\-+÷]\#/)) {
-              const re = /#/;
-              let string = mathStr.arrMathOperations.join("");
-              let arr = string.split(re);
-              if (arr[arr.length - 1] === "") arr.pop();
-              let result = getResult(arr);
-              if (result !== "Infinity") {
-                mathStr.mathStringForCalculation = result;
-                mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+              // "Remember the order of operations!"
+              // PEMDAS: Parentheses (Klammern), Exponents (Potenzen), Multiplication (Multiplikation), Division (Division), Addition (Addition), Subtraction (Subtraktion)
+              if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 1].match(/\#[×÷]\#/) && mathStr.arrMathOperations[mathStr.arrMathOperations.length - 3].match(/\#[\-+]\#/)) {
+                //multiplication, division first!
+                //no interim result
               } else {
-                mathStr.mathStringForOutput = "Error: Div/0";
-                //clear array
-                mathStr.arrMathOperations.length = 0;
-                resetDisplayString = true;
+                const regEx = /#/;
+                let string = mathStr.arrMathOperations.join("");
+                let arr = string.split(regEx);
+                if (arr[arr.length - 1] === "") arr.pop();
+                result = getResult(arr);
+                if (result !== "Infinity") {
+                  mathStr.mathStringForCalculation = result;
+                  mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
+                } else {
+                  mathStr.mathStringForOutput = "Error: Div/0";
+                  //clear array
+                  mathStr.arrMathOperations.length = 0;
+                  resetDisplayString = true;
+                };
               };
               resultDisplayString.innerHTML = mathStr.mathStringForOutput;
             };
           };
           break;
         case "=":
-          gui = new Operator();
+          helper = new CalculatorHelper();
           resetDisplayString = true;
-          gui.triggerObject = e.target.id;
-          gui.mathOperator = e.target.innerText;
-          arrOfGui.push(gui);
+          helper.triggerObject = e.target.id;
+          helper.mathOperator = e.target.innerText;
+          arrOfHelper.push(helper);
           //add operands to array
           mathStr.arrMathOperations.push(mathStr.mathStringForCalculation);
           const re = /#/;
           if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 1].match(/\#[×\-+÷]\#/)) mathStr.arrMathOperations.splice((mathStr.arrMathOperations.length - 1), 1);
           let string = mathStr.arrMathOperations.join("");
           let arr = string.split(re);
-          let result = getResult(arr);
+          result = getResult(arr);
           if (result !== "Infinity") {
             result = maxNumberOfDigits(result, mathStr.maxNumberOfDigits);
             mathStr.mathStringForCalculation = result;
             //clear array
             mathStr.arrMathOperations.length = 0;
-            if (result.match(/\d+[,\.]\d+e[-+]\d+/g)){
+            if (result.match(/-*\d+[,\.]\d+e[-+]\d+/g)) {
               mathStr.mathStringForOutput = swapCommaPoint(result);
-            }else{
+            } else {
               mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
             };
           } else {
@@ -472,10 +498,13 @@ function init() {
           mathStr.mathStringForOutput = tempStr.concat("-", mathStr.mathStringForOutput);
           resultDisplayString.innerHTML = mathStr.mathStringForOutput;
       };
-      console.log(`arrMathOperations: ${mathStr.arrMathOperations}`);
+      console.log(`arrMathOperations: ${mathStr.arrMathOperations}, index: ${mathStr.arrMathOperations.length - 1}`);
+      console.log(`calculation.a: ${calculation.a}`);
+      console.log(`calculation.b: ${calculation.b}`);
+      console.log(`result: ${result}`);
       console.log(`mathStringForCalculation: ${mathStr.mathStringForCalculation}`);
       console.log(`mathStr.mathStringForOutput: ${mathStr.mathStringForOutput}`);
-      console.log(`gui.mathOperator: ${gui.mathOperator}`);
+      console.log(`helper.mathOperator: ${helper.mathOperator}`);
     });
   };
 };
