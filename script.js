@@ -115,12 +115,14 @@ function setButtonActive(id) {
   let button = document.getElementById(id);
   button.style.backgroundColor = "#D5573B";
   button.style.color = "#C6ECAE";
+  button.style.borderColor = "#C6ECAE";
 };
 
 function setButtonInactive(id) {
   let button = document.getElementById(id);
   button.style.backgroundColor = "#94C9A9";
   button.style.color = "#777DA7";
+  button.style.borderColor = "#777DA7";
 }
 
 function tSeparator(str) {

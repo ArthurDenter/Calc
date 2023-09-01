@@ -9,13 +9,14 @@
 </head>
 
 <body>
+    <div class="headline">| SIMPLE.CALC |</div>
     <main class="calc_app">
         <section class="result">
             <div class="result_display">
                 <p class="result_display_string">-</p>
             </div>
         </section>
-        <section class="input">
+        <section class="input" tabindex="-1" id="button_sec">
             <button class="input_numbers_button" id="button_9" tabindex="-1">9</button>
             <button class="input_numbers_button" id="button_8" tabindex="-1">8</button>
             <button class="input_numbers_button" id="button_7" tabindex="-1">7</button>
@@ -27,14 +28,14 @@
             <button class="input_numbers_button" id="button_1" tabindex="-1">1</button>
             <button class="input_numbers_button" id="button_0" tabindex="-1">0</button>
             <button class="input_numbers_button" id="button_comma" tabindex="-1">,</button>
-            <button autofocus class="input_operations_button" id="button_free1" tabindex="-1">C</button>
+            <button class="input_operations_button" id="button_free1" tabindex="-1">C</button>
             <button class="input_operations_button" id="button_free2" tabindex="-1">±</button>
             <button class="input_operations_button" id="button_free3" tabindex="-1">%</button>
             <button class="input_operations_button" id="button_plus" tabindex="-1">+</button>
             <button class="input_operations_button" id="button_minus" tabindex="-1">-</button>
             <button class="input_operations_button" id="button_div" tabindex="-1">÷</button>
             <button class="input_operations_button" id="button_mul" tabindex="-1">×</button>
-            <button class="input_operations_button" id="button_equ" tabindex="-1">=</button>
+            <button autofocus class="input_operations_button" id="button_equ" tabindex="-1">=</button>
         </section>
         <script src="script.js"></script>
     </main>

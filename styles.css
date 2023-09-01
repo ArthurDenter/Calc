@@ -11,6 +11,7 @@ body {
     box-sizing: border-box;
     background-color:#777DA7;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100vw;
@@ -29,6 +30,12 @@ body {
     border-radius: 2vmax;
 }
 
+.headline {
+    color: #C6ECAE;
+    font-size: 2em;
+    padding-bottom: 1em;
+}
+
 .result {
     grid-row: 1/2;
     background-color: #C6ECAE;
@@ -43,7 +50,7 @@ body {
 .result div{
     text-align: right;
     /* height: 33%; */
-    padding-right: 3%;
+    padding-right: 4%;
 }
 
 .result p{
@@ -83,9 +90,9 @@ body {
 }
 .input_operations_button:focus,
 .input_numbers_button:focus {
-    color:#D5573B;
+    color:#777DA7;
     outline: none;
-    border: 2px solid #D5573B;;
+    border: 2px solid #777DA7;
 }
 
 .input_operations_button{
