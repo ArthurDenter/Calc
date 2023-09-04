@@ -99,6 +99,31 @@ function maxNumberOfDigits(str, maxNumberOfDigits) {
   };
 };
 
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+}
+
+function getRandomColor(int) {
+  switch (int) {
+    case 1:
+      return "#6DE15E";
+      break
+    case 2:
+      return "#82EEE5";
+      break
+    case 3:
+      return "#FF3769";
+      break
+    case 4:
+      return "#4838F5";
+      break
+    case 5:
+      return "#202020";
+  }
+}
+
 function backspaceStr(str) {
   return str.slice(0, str.length - 1);
 }
@@ -113,16 +138,16 @@ function swapCommaPoint(str) {
 
 function setButtonActive(id) {
   let button = document.getElementById(id);
-  button.style.backgroundColor = "#D5573B";
-  button.style.color = "#C6ECAE";
-  button.style.borderColor = "#C6ECAE";
+  button.style.backgroundColor = "#FFFFFF";
+  button.style.color = "#202020";
+  button.style.borderColor = "#333533";
 };
 
 function setButtonInactive(id) {
   let button = document.getElementById(id);
-  button.style.backgroundColor = "#94C9A9";
-  button.style.color = "#777DA7";
-  button.style.borderColor = "#777DA7";
+  button.style.backgroundColor = "#FFF68F";
+  button.style.color = "#202020";
+  button.style.borderColor = "#333533";
 }
 
 function tSeparator(str) {
@@ -164,10 +189,6 @@ function tSeparator(str) {
   else {
     return arrWithoutMinus.join("") + arrAfterComma.join("");
   };
-};
-
-function updateDisplay(str) {
-
 };
 
 function init() {
