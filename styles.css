@@ -172,7 +172,12 @@ body {
 }
 
 #button_0 {
-    grid-area: 5/1/5/2;
+    grid-area: 5/1/5/3;
+    aspect-ratio: 5/1;
+    height: 4rem;
+    width: 8.5rem;
+    border-radius: 4rem;
+    
 }
 
 #button_comma {
