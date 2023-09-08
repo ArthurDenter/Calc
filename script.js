@@ -125,7 +125,13 @@ function getRandomColor(int) {
 }
 
 function backspaceStr(str) {
-  return str.slice(0, str.length - 1);
+  if (str.length > 1) {
+    return str.slice(0, str.length - 1);
+  } else if (str.length === 1) {
+    return str = "0";
+  } else if (str === ""){
+    return str = "0";
+  };
 }
 
 function expo(x, f) {
