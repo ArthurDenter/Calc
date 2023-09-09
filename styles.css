@@ -9,16 +9,16 @@
 --tea-green: #c6ecaeff; */
 
 body {
+    font-family: tt-commons-pro, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     box-sizing: border-box;
-    background-color: #FFF68F;
+    background-image: linear-gradient(109deg, #B7FDEDFF 0%, #3398E626 99%),linear-gradient(295deg, #FFE7F0FF 0%, #A5B4FFFF 99%);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     margin: 0;
     height: 100dvh;
-    font-family: tt-commons-pro, sans-serif;
-    font-weight: 400;
+    font-weight: 200;
     font-style: normal;
 
 }
@@ -26,7 +26,6 @@ body {
 .calc_app {
     aspect-ratio: 2.1/4;
     height: 66%;
-    background-color: #FFF68F;
     display: grid;
     grid-template-rows: 1fr 1fr 1fr;
     border-radius: 2vmax;
@@ -56,7 +55,6 @@ body {
 
 .result {
     grid-row: 1;
-    background-color: #FFF68F;
     color: #202020;
     display: flex;
     align-items: end;
@@ -91,7 +89,6 @@ body {
 .input_numbers_button {
     font-style: normal;
     font-weight: 200;
-    font-style: normal;
     border: none;
     color: #202020;
     text-align: center;
@@ -108,19 +105,15 @@ body {
 
 .input_operations_button:focus,
 .input_numbers_button:focus {
+    background-color: rgba(245, 245, 245, 0.2);
     color: #202020;
     outline: none;
     border: 1px solid #333533;
 }
 
-.input_operations_button {
-    background-color: #FFF68F;
-    border: 1px solid #333533;
-}
-
+.input_operations_button,
 .input_numbers_button {
-    /* background-color: #D5573B; */
-    background-color: #FFF68F;
+    background-color: rgba(245, 245, 245, 0.2);
     border: 1px solid #333533;
 }
 
@@ -176,7 +169,7 @@ body {
     height: 4rem;
     width: 8.5rem;
     border-radius: 4rem;
-    
+
 }
 
 #button_comma {

@@ -151,7 +151,7 @@ function setButtonActive(id) {
 
 function setButtonInactive(id) {
   let button = document.getElementById(id);
-  button.style.backgroundColor = "#FFF68F";
+  button.style.backgroundColor = "rgba(245, 245, 245, 0.2)";
   button.style.color = "#202020";
   button.style.borderColor = "#333533";
 }
