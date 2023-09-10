@@ -3,8 +3,9 @@ function MathString() {
   this.mathStringForCalculation = "";
   this.mathStringForOutput = "";
   this.maxNumberOfDigits = 12;
+  this.lastCalculatedValue = [0];
 
-  this.updateMathStrings = function (digit) {
+  this.setMathStrings = function (digit) {
     let tempDisplayStr = "";
     if (digit === ",") {
       this.mathStringForCalculation += ".";
@@ -16,9 +17,53 @@ function MathString() {
   };
 };
 
+function DisplayString() {
+  this.displayString = "";
+
+  this.setDisplayString = function (str) {
+    let resultDisplayString = document.querySelector(".result_display_string");
+    this.displayString = str;
+    resultDisplayString.style.fontSize = (this.displayString.length >= 9) ? "3rem" : "4rem";
+    resultDisplayString.innerHTML = str;
+  }
+
+  this.getDisplayString = function () {
+    return this.displayString;
+  }
+}
+
 function CalculatorHelper() {
   this.mathOperator = "";
   this.triggerObject = "";
+};
+
+function RGB(r = 0, g = 0, b = 0) {
+  this.r = r;
+  this.g = g;
+  this.b = b;
+
+  this.setRGB = function (intR, intG, intB) {
+    this.r = intR;
+    this.g = intG;
+    this.b = intB;
+  };
+
+  this.getRGB = function () {
+    let arr = [this.r, this.g, this.b];
+    return arr;
+  };
+
+  this.setColorLighter = function () {
+    this.r = (this.r < 255) ? Math.floor(this.r + ((this.r / 100) * 1.2)) : this.r;
+    this.g = (this.g < 255) ? Math.floor(this.g - ((this.g / 100) * 1.8)) : this.g;
+    this.b = (this.b < 255) ? Math.floor(this.b - ((this.b / 100) * 2.4)) : this.b;
+  };
+
+  this.setColorDarker = function () {
+    this.r = (this.r > 0) ? Math.ceil(this.r - ((this.r / 100) * 1.2)) : this.r;
+    this.g = (this.g > 0) ? Math.ceil(this.g + ((this.g / 100) * 1.8)) : this.g;
+    this.b = (this.b > 0) ? Math.ceil(this.b + ((this.b / 100) * 2.4)) : this.b;
+  };
 };
 
 let calculation = {
@@ -99,37 +144,26 @@ function maxNumberOfDigits(str, maxNumberOfDigits) {
   };
 };
 
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
 }
 
 function getRandomColor(int) {
-  switch (int) {
-    case 1:
-      return "#6DE15E";
-      break
-    case 2:
-      return "#82EEE5";
-      break
-    case 3:
-      return "#FF3769";
-      break
-    case 4:
-      return "#4838F5";
-      break
-    case 5:
-      return "#202020";
-  }
+  let choice = getRandomInt(2);
+  if (choice === 0) {
+    return Math.ceil(int - ((int / 100) * 1.5));
+  } else {
+    return Math.floor(int + ((int / 100) * 1.5));
+  };
 }
+
 
 function backspaceStr(str) {
   if (str.length > 1) {
     return str.slice(0, str.length - 1);
   } else if (str.length === 1) {
     return str = "0";
-  } else if (str === ""){
+  } else if (str === "") {
     return str = "0";
   };
 }
@@ -200,13 +234,17 @@ function tSeparator(str) {
 function init() {
   let arrOfButtons = document.querySelectorAll("button");
   let resultDisplayString = document.querySelector(".result_display_string");
+  let calcAppBody = document.querySelector("body");
   let resetDisplayString = false;
   let arrOfHelper = [];
+  let gradient_1_RGB = [new RGB(183, 235, 237), new RGB(51, 152, 230)];
+  let gradient_2_RGB = [new RGB(255, 231, 240), new RGB(165, 180, 255)];
   let helper = new CalculatorHelper();
   let mathStr = new MathString();
+  let displayStr = new DisplayString();
   let result = null;
 
-  resultDisplayString.innerHTML = "0";
+  displayStr.setDisplayString("0");
   for (let button of arrOfButtons) {
     button.addEventListener("keydown", (e) => {
       console.log(e);
@@ -232,7 +270,7 @@ function init() {
         case "Numpad8":
         case "Numpad9":
           if (resetDisplayString === true) {
-            resultDisplayString.innerHTML = "";
+            displayStr.setDisplayString("");
             mathStr.mathStringForOutput = "";
             mathStr.mathStringForCalculation = "";
             resetDisplayString = false;
@@ -242,24 +280,23 @@ function init() {
               arrOfHelper[arrOfHelper.length - 1].mathOperator = "";
             };
           };
-          if (resultDisplayString.innerHTML.length <= mathStr.maxNumberOfDigits) {
-            if (resultDisplayString.innerHTML !== "0") {
-              if (resultDisplayString.innerHTML.length >= 9) resultDisplayString.style.fontSize = "4vmax";
-              mathStr.updateMathStrings(e.key);
-              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+          if (displayStr.getDisplayString().length <= mathStr.maxNumberOfDigits) {
+            if (displayStr.getDisplayString() !== "0") {
+              mathStr.setMathStrings(e.key);
+              displayStr.setDisplayString(mathStr.mathStringForOutput);
             } else {
               mathStr.mathStringForOutput = e.key;
               mathStr.mathStringForCalculation = e.key;
-              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+              displayStr.setDisplayString(mathStr.mathStringForOutput);
             };
           };
           break;
         case "NumpadDecimal":
         case "Comma":
-          if (resultDisplayString.innerHTML.length <= mathStr.maxNumberOfDigits) {
+          if (displayStr.getDisplayString().length <= mathStr.maxNumberOfDigits) {
             if (mathStr.mathStringForCalculation.includes(".") === false) {
-              mathStr.updateMathStrings(e.key);
-              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+              mathStr.setMathStrings(e.key);
+              displayStr.setDisplayString(mathStr.mathStringForOutput);
             };
           };
           break;
@@ -291,14 +328,14 @@ function init() {
             //clear array
             mathStr.arrMathOperations.length = 0;
           };
-          resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+          displayStr.setDisplayString(mathStr.mathStringForOutput);
           resetDisplayString = true;
           break;
         case "Backspace":
           if (resetDisplayString === false) {
             mathStr.mathStringForCalculation = backspaceStr(mathStr.mathStringForCalculation);
             mathStr.mathStringForOutput = backspaceStr(mathStr.mathStringForOutput);
-            resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+            displayStr.setDisplayString(mathStr.mathStringForOutput);
           };
           break;
         case "NumpadAdd":
@@ -358,7 +395,7 @@ function init() {
                   resetDisplayString = true;
                 };
               };
-              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+              displayStr.setDisplayString(mathStr.mathStringForOutput);
             };
           };
           break;
@@ -383,7 +420,7 @@ function init() {
         case "8":
         case "9":
           if (resetDisplayString === true) {
-            resultDisplayString.innerHTML = "";
+            displayStr.setDisplayString("");
             mathStr.mathStringForCalculation = "";
             mathStr.mathStringForOutput = "";
             resetDisplayString = false;
@@ -393,24 +430,23 @@ function init() {
               arrOfHelper[arrOfHelper.length - 1].mathOperator = "";
             };
           };
-          if (resultDisplayString.innerHTML.length <= mathStr.maxNumberOfDigits) {
-            if (resultDisplayString.innerHTML !== "0") {
-              if (resultDisplayString.innerHTML.length >= 9) resultDisplayString.style.fontSize = "4vmax";
-              mathStr.updateMathStrings(e.target.innerText);
-              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+          if (displayStr.getDisplayString().length <= mathStr.maxNumberOfDigits) {
+            if (displayStr.getDisplayString() !== "0") {
+              mathStr.setMathStrings(e.target.innerText);
+              displayStr.setDisplayString(mathStr.mathStringForOutput);
             } else {
-              resultDisplayString.innerHTML = e.target.innerText;
+              displayStr.setDisplayString(e.target.innerText);
               mathStr.mathStringForOutput = e.target.innerText;
               mathStr.mathStringForCalculation = e.target.innerText;
             };
           };
           break;
         case ",":
-          if (resultDisplayString.innerHTML.length <= mathStr.maxNumberOfDigits) {
+          if (displayStr.getDisplayString().length <= mathStr.maxNumberOfDigits) {
             if (mathStr.mathStringForCalculation.includes(".") === false) {
               mathStr.mathStringForCalculation += ".";
               mathStr.mathStringForOutput += ",";
-              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+              displayStr.setDisplayString(mathStr.mathStringForOutput);
             };
           };
           break;
@@ -457,6 +493,7 @@ function init() {
                 result = getResult(arr);
                 if (result !== "Infinity") {
                   mathStr.mathStringForCalculation = result;
+                  mathStr.lastCalculatedValue.push(result);
                   mathStr.mathStringForOutput = tSeparator(swapCommaPoint(result));
                 } else {
                   mathStr.mathStringForOutput = "Error: Div/0";
@@ -465,7 +502,20 @@ function init() {
                   resetDisplayString = true;
                 };
               };
-              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+              if (Number(mathStr.lastCalculatedValue[mathStr.lastCalculatedValue.length - 2]) < Number(mathStr.lastCalculatedValue[mathStr.lastCalculatedValue.length - 1])) {
+                gradient_1_RGB[0].setColorDarker();
+                gradient_1_RGB[1].setColorDarker();
+                gradient_2_RGB[0].setColorDarker();
+                gradient_2_RGB[1].setColorDarker();
+              } else if (Number(mathStr.lastCalculatedValue[mathStr.lastCalculatedValue.length - 2]) > Number(mathStr.lastCalculatedValue[mathStr.lastCalculatedValue.length - 1])) {
+                gradient_1_RGB[0].setColorLighter();
+                gradient_1_RGB[1].setColorLighter();
+                gradient_2_RGB[0].setColorLighter();
+                gradient_2_RGB[1].setColorLighter();
+              };
+              console.log(`linear-gradient(109deg, rgba(${gradient_1_RGB[0].getRGB().toString()}, 1) 0%, rgba(${gradient_1_RGB[1].getRGB().toString()}, 0.15) 99%),linear-gradient(295deg, rgba(${gradient_2_RGB[0].getRGB().toString()}, 1) 0%, rgba(${gradient_2_RGB[1].getRGB().toString()}, 1) 99%)`);
+              calcAppBody.style.backgroundImage = `linear-gradient(109deg, rgba(${gradient_1_RGB[0].getRGB().toString()}, 1) 0%, rgba(${gradient_1_RGB[1].getRGB().toString()}, 0.15) 99%),linear-gradient(295deg, rgba(${gradient_2_RGB[0].getRGB().toString()}, 1) 0%, rgba(${gradient_2_RGB[1].getRGB().toString()}, 1) 99%)`;
+              displayStr.setDisplayString(mathStr.mathStringForOutput);
             };
           };
           break;
@@ -497,7 +547,7 @@ function init() {
             //clear array
             mathStr.arrMathOperations.length = 0;
           };
-          resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+          displayStr.setDisplayString(mathStr.mathStringForOutput);
           resetDisplayString = true;
           break;
         case "%":
@@ -505,16 +555,16 @@ function init() {
             calculation.a = mathStr.mathStringForCalculation;
             calculation.b = 100;
             mathStr.mathStringForOutput = calculation["÷"]();
-            resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+            displayStr.setDisplayString(mathStr.mathStringForOutput);
           } else {
             if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 1].match(/\#[\-+]\#/)) {
               mathStr.mathStringForOutput += e.target.innerText;
               mathStr.mathStringForCalculation = ((mathStr.mathStringForCalculation * mathStr.arrMathOperations[mathStr.arrMathOperations.length - 2]) / 100).toString();
-              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+              displayStr.setDisplayString(mathStr.mathStringForOutput);
             } else if (mathStr.arrMathOperations[mathStr.arrMathOperations.length - 1].match(/\#[×÷]\#/)) {
               mathStr.mathStringForOutput += e.target.innerText;
               mathStr.mathStringForCalculation = (mathStr.mathStringForCalculation / 100).toString();
-              resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+              displayStr.setDisplayString(mathStr.mathStringForOutput);
             };
           };
           break;
@@ -525,15 +575,17 @@ function init() {
           let tempStr = "";
           mathStr.mathStringForCalculation = tempStr.concat("-", mathStr.mathStringForCalculation);
           mathStr.mathStringForOutput = tempStr.concat("-", mathStr.mathStringForOutput);
-          resultDisplayString.innerHTML = mathStr.mathStringForOutput;
+          displayStr.setDisplayString(mathStr.mathStringForOutput);
       };
       console.log(`arrMathOperations: ${mathStr.arrMathOperations}, index: ${mathStr.arrMathOperations.length - 1}`);
       console.log(`calculation.a: ${calculation.a}`);
       console.log(`calculation.b: ${calculation.b}`);
       console.log(`result: ${result}`);
+      console.log(`mathStr.lastCalculatedValue: ${mathStr.lastCalculatedValue}`);
       console.log(`mathStringForCalculation: ${mathStr.mathStringForCalculation}`);
       console.log(`mathStr.mathStringForOutput: ${mathStr.mathStringForOutput}`);
       console.log(`helper.mathOperator: ${helper.mathOperator}`);
+      console.log(`--------`)
     });
   };
 };
