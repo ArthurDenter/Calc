@@ -395,6 +395,19 @@ function init() {
                   resetDisplayString = true;
                 };
               };
+              if (Number(mathStr.lastCalculatedValue[mathStr.lastCalculatedValue.length - 2]) < Number(mathStr.lastCalculatedValue[mathStr.lastCalculatedValue.length - 1])) {
+                gradient_1_RGB[0].setColorDarker();
+                gradient_1_RGB[1].setColorDarker();
+                gradient_2_RGB[0].setColorDarker();
+                gradient_2_RGB[1].setColorDarker();
+              } else if (Number(mathStr.lastCalculatedValue[mathStr.lastCalculatedValue.length - 2]) > Number(mathStr.lastCalculatedValue[mathStr.lastCalculatedValue.length - 1])) {
+                gradient_1_RGB[0].setColorLighter();
+                gradient_1_RGB[1].setColorLighter();
+                gradient_2_RGB[0].setColorLighter();
+                gradient_2_RGB[1].setColorLighter();
+              };
+              console.log(`linear-gradient(109deg, rgba(${gradient_1_RGB[0].getRGB().toString()}, 1) 0%, rgba(${gradient_1_RGB[1].getRGB().toString()}, 0.15) 99%),linear-gradient(295deg, rgba(${gradient_2_RGB[0].getRGB().toString()}, 1) 0%, rgba(${gradient_2_RGB[1].getRGB().toString()}, 1) 99%)`);
+              calcAppBody.style.backgroundImage = `linear-gradient(109deg, rgba(${gradient_1_RGB[0].getRGB().toString()}, 1) 0%, rgba(${gradient_1_RGB[1].getRGB().toString()}, 0.15) 99%),linear-gradient(295deg, rgba(${gradient_2_RGB[0].getRGB().toString()}, 1) 0%, rgba(${gradient_2_RGB[1].getRGB().toString()}, 1) 99%)`;
               displayStr.setDisplayString(mathStr.mathStringForOutput);
             };
           };
